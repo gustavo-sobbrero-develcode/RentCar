@@ -25,25 +25,25 @@ describe("Create Category", () => {
     const categoryCreated = await categoriesRepositoryInMemory.findByName(
       category.name
     );
-    console.log(categoryCreated);
 
     expect(categoryCreated).toHaveProperty("id");
   });
 
   it("should not be able to create a new category with name exists", async () => {
-    expect(async () => {
-      const category = {
-        name: "Category Test",
-        description: "Category Test Description",
-      };
-      await createCategoryUseCase.execute({
+    const category = {
+      name: "Category Test",
+      description: "Category Test Description",
+    };
+    await createCategoryUseCase.execute({
+      name: category.name,
+      description: category.description,
+    });
+
+    await expect(
+      createCategoryUseCase.execute({
         name: category.name,
         description: category.description,
-      });
-      await createCategoryUseCase.execute({
-        name: category.name,
-        description: category.description,
-      });
-    }).rejects.toBeInstanceOf(AppError);
+      })
+    ).rejects.toEqual(new AppError("Category already exists"));
   });
 });
